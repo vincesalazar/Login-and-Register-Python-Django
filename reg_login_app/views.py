@@ -14,6 +14,7 @@ def register(request):
             messages.error(request, value)
         return redirect('/')
     lowerCaseEmail = post['email'].lower()
+#     CHECKING TO SEE IF EMAIL IS ALREADY IN DATABASE
     if User.objects.filter(email = lowerCaseEmail).exists():
         messages.error(request, "That email already exists")
         return redirect('/')
@@ -21,6 +22,7 @@ def register(request):
     capitalizedLastName = post['last_name'].capitalize()
     password = post['password']
     pw_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+#     CREATING USER
     user = User.objects.create(
         first_name = capitalizedFirstName, 
         last_name = capitalizedLastName, 
@@ -48,12 +50,11 @@ def login(request):
         return redirect('/')
     
 def success(request):
+# MAKING SURE A USER WHOS LOGGED OUT HAS TO LOG BACK IN. SECURITY PURPOSE
     if "user_id" not in request.session:
         messages.error(request, "Must be logged in")
         return redirect('/')
-    
     user_id = request.session['user_id']
-
     context = {
         "user": User.objects.get(id=user_id)
     }
